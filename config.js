@@ -1,9 +1,8 @@
 // === 索菲娅 AI 配置文件 ===
-// 请在此替换为你自己的硅基流动 API Key
-// 格式形如：sk-xxxxxxxxxxxxxxxxxxxx
+// 请在此处粘贴你完整的硅基流动 API 密钥（以 sk- 开头，无省略号）
 
 const CONFIG = {
-  API_KEY: "sk-V0e83sdnfd82349ndfk293kvray...",
-  API_URL: "https://api.siliconflow.cn/v1/chat/completions",
-  MODEL: "Qwen/Qwen1.5-14B-Chat"
+  API_KEY: "sk-mxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", // 👈 在这里粘贴完整的密钥！
+  API_URL: "https://api.siliconflow.cn/v1/proxy/chat/completions",
+  MODEL: "Qwen/Qwen2-7B-Instruct"
 };
