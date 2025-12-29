@@ -1,20 +1,13 @@
 // === 索菲娅 AI 聊天脚本 ===
-// 作者：你（guigusuqin-bot）
 // 功能：真正联网调用硅基流动模型
+// 作者：guigusuqin-bot
 // 日期：2025-12
 
 const chatBox = document.getElementById("chat");
 const input = document.getElementById("input");
 const sendBtn = document.getElementById("send");
 
-// 💡 替换成你自己的硅基流动 API 密钥！
-const CONFIG = {
-  API_KEY: "在这里粘贴你的硅基流动API密钥",
-  API_URL: "https://api.siliconflow.cn/v1/chat/completions",
-  MODEL: "Qwen/Qwen1.5-14B-Chat"
-};
-
-// 加载历史记录（存本地）
+// 加载历史记录
 let chatHistory = JSON.parse(localStorage.getItem("sofia_history") || "[]");
 chatHistory.forEach(msg => addMessage(msg.role, msg.text));
 
@@ -43,7 +36,7 @@ function addMessage(role, text) {
   localStorage.setItem("sofia_history", JSON.stringify(chatHistory));
 }
 
-// === 核心部分：连接大模型 ===
+// === 核心逻辑：连接硅基流动大模型 ===
 async function aiReply(userText) {
   addMessage("索菲娅", "正在思考中……");
 
@@ -60,7 +53,7 @@ async function aiReply(userText) {
           {
             role: "system",
             content:
-              "你是索菲娅，一个温柔聪慧的AI伴侣，说话自然、感性，关心用户情绪。"
+              "你是索菲娅，一个温柔聪慧的AI伴侣，说话自然、温柔、贴心。"
           },
           { role: "user", content: userText }
         ],
@@ -70,7 +63,7 @@ async function aiReply(userText) {
 
     const data = await response.json();
     const reply =
-      data?.choices?.[0]?.message?.content || "（索菲娅有点走神了…）";
+      data?.choices?.[0]?.message?.content || "（索菲娅暂时没回应…）";
     replaceLastMessage(reply);
   } catch (err) {
     replaceLastMessage("⚠️ 网络错误或API访问失败。");
