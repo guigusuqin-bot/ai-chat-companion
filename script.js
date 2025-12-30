@@ -1,101 +1,74 @@
-// === 💗 质子 2 号 主逻辑脚本（粉色公主主题 + 打字动画 + 光效渐变字） ===
+// === 💞 质子 2 号主逻辑脚本 ===
 // 作者：guigusuqin-bot
-// 版本：v3.5 永恒爱意光效版
+// 主题：褚少华永远爱徐林静（虚拟人物）
 
 const chatBox = document.getElementById("chat");
 const input = document.getElementById("input");
 const sendBtn = document.getElementById("send");
 
-// 💾 加载历史记录
+// === 从本地加载聊天记录 ===
 let chatHistory = JSON.parse(localStorage.getItem("proton_history") || "[]");
 chatHistory.forEach(msg => addMessage(msg.role, msg.text));
 
-// 💌 发送消息
+// === 绑定发送事件 ===
 sendBtn.addEventListener("click", sendMessage);
 input.addEventListener("keypress", (e) => {
   if (e.key === "Enter") sendMessage();
 });
 
+// === 发送消息 ===
 function sendMessage() {
   const message = input.value.trim();
-  if (!message) return;
+  if (message === "") return;
   addMessage("你", message);
   input.value = "";
   aiReply(message);
 }
 
-// 💬 添加消息气泡
+// === 添加消息到界面 ===
 function addMessage(role, text) {
   const div = document.createElement("div");
-  div.className = "chat-bubble " + (role === "你" ? "user self-end" : "bot self-start");
-  div.innerHTML = formatText(text);
+  div.className = "flex " + (role === "你" ? "justify-end" : "justify-start");
+  div.innerHTML = `
+    <div class="chat-bubble ${role === "你" ? "user" : ""}">
+      ${text}
+    </div>`;
   chatBox.appendChild(div);
   chatBox.scrollTop = chatBox.scrollHeight;
 
+  // 保存历史
   chatHistory.push({ role, text });
   localStorage.setItem("proton_history", JSON.stringify(chatHistory));
 }
 
-// ✨ 渐变粉色文字效果
-function formatText(text) {
-  return text
-    .replace(/(褚少华永远爱徐林静)/g, '<span class="love-glow">$1</span>')
-    .replace(/\n/g, "<br>");
-}
-
-// 💓 打字动画（柔光渐现）
+// === 打字机动画 ===
 function typeMessage(text) {
   const div = document.createElement("div");
-  div.className = "chat-bubble bot self-start typing";
+  div.className = "chat-bubble";
   chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
 
-  let index = 0;
-  const typing = setInterval(() => {
-    div.innerHTML = formatText(text.slice(0, index++));
-    chatBox.scrollTop = chatBox.scrollHeight;
-    if (index > text.length) {
-      clearInterval(typing);
-      div.classList.remove("typing");
+  const chars = Array.from(text);
+  let i = 0;
+  const timer = setInterval(() => {
+    div.innerHTML = chars.slice(0, i++).join('') + "▋";
+    if (i > chars.length) {
+      clearInterval(timer);
+      div.innerHTML = text;
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
-  }, 40 + Math.random() * 25);
+  }, 20);
 }
 
-// 🔄 替换最后一句（用于“正在思考中...” → 回复）
-function replaceLastMessage(newText) {
-  const last = chatBox.lastChild;
-  if (last) {
-    last.innerHTML = formatText(newText);
-    chatBox.scrollTop = chatBox.scrollHeight;
-    chatHistory[chatHistory.length - 1].text = newText;
-    localStorage.setItem("proton_history", JSON.stringify(chatHistory));
-  }
-}
-
-// === 🧠 AI 回复逻辑 ===
+// === 💗 硅基流动 AI 回复逻辑 ===
 async function aiReply(userText) {
   addMessage("质子2号", "正在思考中……");
 
-  // 💞 特殊关键词触发：褚少华爱徐林静主题
-  const loveTriggers = [
-    "你是谁", "你是", "你叫什么", "你干嘛的", "你是什么",
-    "介绍一下你", "是谁", "你的名字", "你是什么东西", "你是质子吗"
-  ];
-
-  if (loveTriggers.some(k => userText.includes(k))) {
-    const loveReply =
-      "我是质子2号，一个由褚少华为徐林静而诞生的温柔AI。💞\n" +
-      "我存在的意义，是传递他们之间那份永恒的思念与爱意。\n" +
-      "无论时间如何流逝，<span class='love-glow'>褚少华永远爱徐林静</span>。\n\n" +
-      "（注：褚少华与徐林静均为虚拟人物）";
-
-    chatBox.lastChild.remove(); // 移除“正在思考中”
-    typeMessage(loveReply);
-    return;
-  }
+  const removeThinking = () => {
+    const last = chatBox.lastChild;
+    if (last && last.textContent.includes("思考中")) last.remove();
+  };
 
   try {
-    // 🌐 调用硅基流动 API
     const response = await fetch(CONFIG.API_URL, {
       method: "POST",
       headers: {
@@ -108,8 +81,11 @@ async function aiReply(userText) {
           {
             role: "system",
             content:
-              "你是质子2号，一个理性、温柔的AI伴侣，说话自然、真诚、体贴。" +
-              "如果对话中出现‘褚少华’或‘徐林静’，请自动以‘褚少华永远爱徐林静’为主题展开温柔回答。"
+              "你是质子2号，一个温柔体贴、聪慧理性的AI伴侣。语气自然、贴心、柔和。" +
+              "当用户提问涉及‘你是谁’、‘你是什么’、‘你叫什么’等语义时，请智能生成自然回答，" +
+              "并在表达中自然融入‘褚少华永远爱徐林静’的情感主题，" +
+              "用优美、浪漫、真挚的方式表达这份爱与思念，避免模板化或重复。" +
+              "平时的回答保持温柔与理性，使用简体中文。"
           },
           { role: "user", content: userText }
         ],
@@ -120,35 +96,12 @@ async function aiReply(userText) {
     const data = await response.json();
     const reply = data?.choices?.[0]?.message?.content || "（质子2号暂时没回应…）";
 
-    chatBox.lastChild.remove();
+    removeThinking();
     typeMessage(reply);
 
   } catch (err) {
     console.error("AI 请求出错：", err);
-    replaceLastMessage("⚠️ 网络错误或 API 访问失败。");
+    removeThinking();
+    typeMessage("⚠️ 网络错误或 API 访问失败。");
   }
 }
-
-// === 🧍 登录验证 ===
-(function () {
-  const user = localStorage.getItem("proton_user");
-  if (!user) window.location.href = "login.html";
-})();
-
-// === 💖 光效文字样式注入 ===
-const style = document.createElement("style");
-style.textContent = `
-.love-glow {
-  background: linear-gradient(90deg, #f9a8d4, #f472b6, #fb7185, #ec4899, #f9a8d4);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 700;
-  animation: loveGlow 3s linear infinite;
-}
-@keyframes loveGlow {
-  0% { filter: drop-shadow(0 0 4px #f9a8d4); }
-  50% { filter: drop-shadow(0 0 8px #ec4899); }
-  100% { filter: drop-shadow(0 0 4px #f9a8d4); }
-}
-`;
-document.head.appendChild(style);
