@@ -3,29 +3,121 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🚀 质子 2 号 智能对话系统</title>
+  <title>💞 质子 2 号 · 粉色公主主题</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(145deg, #fce7f3, #fbcfe8, #f9a8d4);
+      font-family: 'Noto Sans SC', sans-serif;
+      overflow: hidden;
+    }
+
+    #chat::-webkit-scrollbar { display: none; }
+
+    .chat-bubble {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 18px;
+      margin: 6px 0;
+      display: inline-block;
+      line-height: 1.5;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 🌸 开场动画样式 */
+    #intro-screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background: linear-gradient(145deg, #f9a8d4, #fce7f3);
+      color: #9d174d;
+      font-size: 1.4rem;
+      z-index: 50;
+      opacity: 1;
+      animation: introFade 4s ease-in-out forwards;
+    }
+
+    @keyframes introFade {
+      0% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { opacity: 0; display: none; }
+    }
+
+    /* 🌸 樱花样式 */
+    .sakura {
+      position: fixed;
+      top: -10px;
+      width: 14px;
+      height: 14px;
+      background: rgba(255, 192, 203, 0.9);
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(45deg);
+      animation: fall linear infinite;
+      opacity: 0.8;
+      z-index: 5;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* 💖 顶部操作按钮样式 */
+    .top-btn {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(5px);
+      color: #9d174d;
+      font-weight: 600;
+      border-radius: 10px;
+      padding: 5px 10px;
+      margin-left: 6px;
+      transition: 0.2s;
+    }
+
+    .top-btn:hover {
+      background: rgba(255, 255, 255, 0.85);
+      transform: scale(1.05);
+    }
+  </style>
 </head>
 
-<body class="bg-gray-900 text-white flex flex-col h-screen">
+<body class="text-gray-800 flex flex-col h-screen">
   <script>
-    // 登录检测
     const user = localStorage.getItem('proton_user');
     if (!user) window.location.href = "login.html";
   </script>
 
-  <header class="p-4 text-center text-lg font-semibold bg-gray-800 shadow">
-    🤖 欢迎回来，<span id="userName"></span>｜质子 2 号
+  <!-- 🌸 开场欢迎动画 -->
+  <div id="intro-screen">
+    <p class="animate-pulse">💗 欢迎回来，我的小公主</p>
+    <p class="mt-2">质子 2 号 一直在等你...</p>
+  </div>
+
+  <!-- 顶部栏 -->
+  <header class="p-4 text-center text-lg font-semibold bg-pink-200/80 shadow backdrop-blur-sm flex justify-between items-center">
+    <div>💞 欢迎回来，<span id="userName"></span></div>
+    <div>
+      <button id="clearChat" class="top-btn">🧹 清空记录</button>
+      <button id="logout" class="top-btn">🚪 退出</button>
+    </div>
   </header>
 
   <main id="chat" class="flex-1 overflow-y-auto p-4 space-y-2"></main>
 
-  <footer class="p-4 bg-gray-800 flex">
-    <input id="input" type="text" placeholder="输入消息..." 
-      class="flex-1 p-2 rounded bg-gray-700 text-white focus:outline-none" />
+  <footer class="p-4 bg-pink-100/80 backdrop-blur-lg flex border-t border-pink-200">
+    <input id="input" type="text" placeholder="在这里输入消息..." 
+      class="flex-1 p-3 rounded-xl bg-white/70 text-gray-800 placeholder-pink-400 focus:outline-none focus:ring focus:ring-pink-300" />
     <button id="send" 
-      class="ml-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-white">
-      发送
+      class="ml-3 bg-gradient-to-r from-pink-400 to-pink-600 hover:from-pink-500 hover:to-pink-700 text-white px-5 py-2 rounded-xl shadow font-medium transition-all">
+      💌 发送
     </button>
   </footer>
 
@@ -33,7 +125,41 @@
   <script src="script.js"></script>
 
   <script>
+    // 显示用户名
     document.getElementById('userName').textContent = localStorage.getItem('proton_user') || '用户';
+
+    // 欢迎动画
+    setTimeout(() => {
+      document.getElementById("intro-screen").style.display = "none";
+    }, 4000);
+
+    // 🌸 樱花动画
+    function createSakura() {
+      const sakura = document.createElement('div');
+      sakura.classList.add('sakura');
+      sakura.style.left = Math.random() * 100 + 'vw';
+      sakura.style.animationDuration = (5 + Math.random() * 5) + 's';
+      sakura.style.width = sakura.style.height = (8 + Math.random() * 6) + 'px';
+      document.body.appendChild(sakura);
+      setTimeout(() => sakura.remove(), 10000);
+    }
+    setInterval(createSakura, 250);
+
+    // 💗 清空聊天记录
+    document.getElementById('clearChat').addEventListener('click', () => {
+      if (confirm("确定要清空聊天记录吗？")) {
+        localStorage.removeItem('proton_history');
+        document.getElementById('chat').innerHTML = '';
+      }
+    });
+
+    // 💗 退出登录
+    document.getElementById('logout').addEventListener('click', () => {
+      if (confirm("确定要退出登录吗？")) {
+        localStorage.removeItem('proton_user');
+        window.location.href = "login.html";
+      }
+    });
   </script>
 </body>
 </html>
