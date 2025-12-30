@@ -1,81 +1,98 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🚪 登录 · 质子 2 号</title>
+  <title>💞 登录 · 质子 2 号</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
-      background: linear-gradient(145deg, #f9a8d4, #fbcfe8, #fce7f3);
+      background: linear-gradient(145deg, #fce7f3, #f9a8d4);
       font-family: 'Noto Sans SC', sans-serif;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
       height: 100vh;
+      color: #9d174d;
     }
-    .login-box {
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(8px);
-      padding: 2rem;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    .card {
+      background: rgba(255,255,255,0.75);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.1);
       text-align: center;
       width: 90%;
-      max-width: 350px;
+      max-width: 380px;
+      backdrop-filter: blur(8px);
     }
     input {
       width: 100%;
       padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #f9a8d4;
-      margin-bottom: 10px;
-      outline: none;
+      border: none;
+      border-radius: 10px;
+      margin-top: 12px;
       text-align: center;
+      background: rgba(255,255,255,0.9);
     }
     button {
+      margin-top: 18px;
       background: linear-gradient(to right, #f472b6, #ec4899);
       color: white;
       border: none;
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      font-weight: bold;
+      padding: 10px 20px;
+      border-radius: 12px;
       cursor: pointer;
+      width: 100%;
+      font-size: 1rem;
+      font-weight: 500;
       transition: 0.3s;
+      box-shadow: 0 4px 12px rgba(249,168,212,0.5);
     }
     button:hover {
-      background: linear-gradient(to right, #fb7185, #e11d48);
+      transform: scale(1.05);
+      background: linear-gradient(to right, #ec4899, #db2777);
     }
+    audio { display: none; }
   </style>
 </head>
 <body>
-
-  <div class="login-box">
-    <h2 class="text-pink-700 text-xl font-semibold mb-4">💞 质子 2 号 登录系统</h2>
-    <input id="username" type="text" placeholder="输入用户名" />
-    <input id="password" type="password" placeholder="输入密码" />
+  <div class="card">
+    <h1 class="text-2xl font-bold mb-3">💖 欢迎来到质子 2 号</h1>
+    <p class="text-sm mb-2">请输入用户名与密码</p>
+    <input type="text" id="username" placeholder="用户名">
+    <input type="password" id="password" placeholder="密码">
     <button id="loginBtn">登录</button>
-    <p id="error" class="text-red-500 text-sm mt-2 hidden">用户名或密码错误</p>
+    <p id="msg" class="mt-2 text-sm text-pink-700"></p>
   </div>
 
+  <!-- 登录成功提示音 -->
+  <audio id="loginSound" src="https://cdn.pixabay.com/download/audio/2022/10/25/audio_7f51e9ffb1.mp3?filename=magic-bell-150844.mp3"></audio>
+
   <script>
-    const loginBtn = document.getElementById("loginBtn");
-    loginBtn.onclick = function() {
-      const user = document.getElementById("username").value.trim();
-      const pass = document.getElementById("password").value.trim();
+    // Base64("徐林静:20011014")
+    const correctHash = "5Yqg5a2Q5paH6YOoOjIwMDExMDE0";
 
-      // ✅ 固定账户信息
-      if (user === "徐林静" && pass === "20011004") {
-        localStorage.setItem("proton_user", user);
-        window.location.href = "index.html";
+    const btn = document.getElementById("loginBtn");
+    const msg = document.getElementById("msg");
+    const sound = document.getElementById("loginSound");
+
+    btn.addEventListener("click", () => {
+      const u = document.getElementById("username").value.trim();
+      const p = document.getElementById("password").value.trim();
+      const encoded = btoa(unescape(encodeURIComponent(u + ":" + p))); // 兼容中文
+
+      if (encoded === correctHash) {
+        const token = btoa(Date.now() + ":" + u);
+        localStorage.setItem("proton_token", token);
+        localStorage.setItem("proton_user", u);
+        msg.innerText = "🌸 验证成功，正在进入质子 2 号...";
+        sound.play();
+        setTimeout(() => (window.location.href = "index.html"), 1800);
       } else {
-        const err = document.getElementById("error");
-        err.classList.remove("hidden");
-        err.textContent = "❌ 用户名或密码错误，请重试";
+        msg.innerText = "❌ 用户名或密码错误";
       }
-    };
+    });
   </script>
-
 </body>
 </html>
