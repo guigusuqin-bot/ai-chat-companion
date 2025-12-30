@@ -25,6 +25,7 @@
       width: 90%;
       max-width: 380px;
       backdrop-filter: blur(8px);
+      transition: transform 0.3s ease;
     }
     input {
       width: 100%;
@@ -59,7 +60,7 @@
   </style>
 </head>
 <body>
-  <div class="card">
+  <div class="card" id="loginCard">
     <h1 class="text-2xl font-bold mb-3">💖 欢迎来到质子 2 号</h1>
     <p class="text-sm mb-2">请输入用户名与密码</p>
     <input type="text" id="username" placeholder="用户名">
@@ -72,27 +73,34 @@
   <audio id="loginSound" src="https://cdn.pixabay.com/download/audio/2022/10/25/audio_7f51e9ffb1.mp3?filename=magic-bell-150844.mp3"></audio>
 
   <script>
-    // Base64("xulinjing:20011014")
-    const correctHash = "5Yqg5a2Q5paH6YOoOjIwMDExMDE0";
+    // ✅ 正确的 Base64("xulinjing:20011014")
+    const correctHash = "eHVsaW5qaW5nOjIwMDExMDE0";
     const sound = document.getElementById("loginSound");
     const msg = document.getElementById("msg");
 
+    // 中文兼容编码
     function encode(str) {
-      return btoa(unescape(encodeURIComponent(str))); // 兼容中文
+      return btoa(unescape(encodeURIComponent(str)));
     }
 
     document.getElementById("loginBtn").addEventListener("click", () => {
       const u = document.getElementById("username").value.trim();
       const p = document.getElementById("password").value.trim();
+      const card = document.getElementById("loginCard");
       const encoded = encode(u + ":" + p);
 
       if (encoded === correctHash) {
         const token = btoa(Date.now() + ":" + u);
         localStorage.setItem("proton_token", token);
         localStorage.setItem("proton_user", u);
+
         msg.innerText = "🌸 登录成功，正在进入质子 2 号...";
         sound.play();
-        setTimeout(() => (window.location.href = "index.html"), 1800);
+        card.style.transform = "scale(0.97)";
+        setTimeout(() => {
+          card.style.transform = "scale(1)";
+          window.location.href = "index.html";
+        }, 1800);
       } else {
         msg.innerHTML = "❌ 用户名或密码错误";
       }
