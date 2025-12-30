@@ -1,0 +1,21 @@
+{
+  "name": "索菲娅 AI 聊天伴侣",
+  "short_name": "索菲娅",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#111827",
+  "theme_color": "#111827",
+  "description": "一个温柔聪慧的 AI 聊天伴侣，用温暖的语言陪伴你。",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
