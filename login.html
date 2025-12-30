@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🚀 质子 2 号 · 登录系统</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-br from-slate-800 to-gray-900 h-screen flex flex-col justify-center items-center text-center font-sans text-white">
+
+  <div class="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl p-8 w-80 border border-white/20">
+    <h1 class="text-2xl font-bold text-blue-300 mb-4">🚀 欢迎使用 质子 2 号</h1>
+    <p class="text-gray-300 mb-6">请输入账号与密码以继续</p>
+
+    <input 
+      id="username" 
+      type="text" 
+      placeholder="用户名"
+      class="w-full p-3 rounded-xl bg-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 mb-4 text-white placeholder-gray-300"
+    />
+
+    <input 
+      id="password" 
+      type="password" 
+      placeholder="密码"
+      class="w-full p-3 rounded-xl bg-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 mb-6 text-white placeholder-gray-300"
+    />
+
+    <button 
+      id="loginBtn" 
+      class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white py-2 rounded-xl shadow font-medium">
+      登录系统
+    </button>
+
+    <p id="msg" class="text-sm text-red-400 mt-3 hidden">用户名或密码错误</p>
+  </div>
+
+  <script>
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const loginBtn = document.getElementById('loginBtn');
+    const msg = document.getElementById('msg');
+
+    // 自动登录
+    const storedUser = localStorage.getItem('proton_user');
+    if (storedUser) window.location.href = "index.html";
+
+    // 登录验证逻辑
+    loginBtn.onclick = () => {
+      const user = usernameInput.value.trim();
+      const pass = passwordInput.value.trim();
+
+      if (user === "徐林静" && pass === "20011004") {
+        localStorage.setItem('proton_user', user);
+        window.location.href = "index.html";
+      } else {
+        msg.classList.remove('hidden');
+        msg.innerText = "❌ 用户名或密码错误";
+      }
+    };
+  </script>
+</body>
+</html>
