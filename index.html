@@ -11,7 +11,6 @@
       font-family: 'Noto Sans SC', sans-serif;
       overflow-x: hidden;
     }
-
     #chat::-webkit-scrollbar { display: none; }
 
     .chat-bubble {
@@ -26,13 +25,11 @@
       backdrop-filter: blur(6px);
       color: #3b0a45;
     }
-
     .chat-bubble.user {
       background: linear-gradient(to right, #f9a8d4, #fb7185);
       color: #fff;
       align-self: flex-end;
     }
-
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -77,16 +74,13 @@
       background: linear-gradient(45deg, #f472b6, #f9a8d4);
       color: white;
       box-shadow: 0 0 12px rgba(255,182,193,0.9);
-      transform: rotate(360deg);
     }
-
     footer {
       position: fixed;
       bottom: 24px;
       left: 0;
       width: 100%;
       z-index: 30;
-      transition: all 0.3s ease-in-out;
     }
   </style>
 </head>
@@ -98,8 +92,8 @@
   </script>
 
   <!-- 🎵 背景音乐 -->
-  <audio id="bgMusic" 
-         src="https://cdn.pixabay.com/download/audio/2023/03/16/audio_efcba91cf3.mp3?filename=love-story-soft-piano.mp3" 
+  <audio id="bgMusic"
+         src="https://cdn.pixabay.com/download/audio/2023/03/16/audio_efcba91cf3.mp3?filename=love-story-soft-piano.mp3"
          loop></audio>
   <div id="musicControl" title="播放 / 暂停音乐">🎵</div>
 
@@ -107,8 +101,8 @@
   <header class="p-4 text-center text-lg font-semibold bg-pink-200/80 shadow backdrop-blur-sm flex justify-between items-center">
     <div>💞 欢迎回来，<span id="userName"></span></div>
     <div>
-      <button id="clearChat" class="top-btn">🧹 清空记录</button>
-      <button id="logout" class="top-btn">🚪 退出</button>
+      <button id="clearChat" class="top-btn bg-white/70 rounded-lg px-3 py-1 mx-1 text-pink-700 font-semibold">🧹 清空记录</button>
+      <button id="logout" class="top-btn bg-white/70 rounded-lg px-3 py-1 mx-1 text-pink-700 font-semibold">🚪 退出</button>
     </div>
   </header>
 
@@ -127,8 +121,10 @@
   <script src="script.js"></script>
 
   <script>
+    // 显示用户名
     document.getElementById('userName').textContent = localStorage.getItem('proton_user') || '用户';
 
+    // 🌸 樱花动画
     function createSakura() {
       const sakura = document.createElement('div');
       sakura.classList.add('sakura');
@@ -140,6 +136,23 @@
     }
     setInterval(createSakura, 300);
 
+    // 💗 清空聊天记录
+    document.getElementById('clearChat').addEventListener('click', () => {
+      if (confirm("确定要清空聊天记录吗？")) {
+        localStorage.removeItem('proton_history');
+        document.getElementById('chat').innerHTML = '';
+      }
+    });
+
+    // 💗 退出登录
+    document.getElementById('logout').addEventListener('click', () => {
+      if (confirm("确定要退出登录吗？")) {
+        localStorage.removeItem('proton_user');
+        window.location.href = "login.html";
+      }
+    });
+
+    // 🎵 音乐控制逻辑
     const music = document.getElementById('bgMusic');
     const control = document.getElementById('musicControl');
     let playing = false;
@@ -164,10 +177,7 @@
       }
     });
 
-    window.addEventListener("DOMContentLoaded", () => {
-      setTimeout(() => playMusic(), 800);
-    });
-
+    // 🚀 在首次聊天或点击页面任意位置后播放
     document.body.addEventListener("click", () => {
       if (!playing) playMusic();
     }, { once: true });
