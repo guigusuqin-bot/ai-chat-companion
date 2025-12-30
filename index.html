@@ -1,3 +1,10 @@
+<script>
+  const token = localStorage.getItem("proton_token");
+  const user = localStorage.getItem("proton_user");
+  if (!token || !user) {
+    window.location.href = "login.html";
+  }
+</script>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
