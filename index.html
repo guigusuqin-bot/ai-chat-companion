@@ -5,36 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>索菲娅 AI 聊天伴侣</title>
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- ✅ PWA 支持配置 -->
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon-512.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="索菲娅">
-  <meta name="theme-color" content="#111827">
 </head>
 
 <body class="bg-gray-900 text-white flex flex-col h-screen">
-  <!-- 页眉 -->
-  <header class="p-4 text-center text-lg font-semibold bg-gray-800 shadow-lg">
+  <header class="p-4 text-center text-lg font-semibold bg-gray-800">
     💬 索菲娅 AI 聊天伴侣
   </header>
 
-  <!-- 聊天区域 -->
   <main id="chat" class="flex-1 overflow-y-auto p-4 space-y-2"></main>
 
-  <!-- 输入区 -->
-  <footer class="p-4 bg-gray-800 flex items-center">
-    <input 
-      id="input" 
-      type="text" 
-      placeholder="输入消息..." 
-      class="flex-1 p-2 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" 
-    />
-    <button 
-      id="send" 
-      class="ml-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-white transition-all duration-200">
+  <!-- 📱 添加到主屏幕按钮 -->
+  <div id="install-container" class="p-3 text-center hidden">
+    <button id="install-button" 
+      class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-md">
+      📱 添加到主屏幕
+    </button>
+  </div>
+
+  <footer class="p-4 bg-gray-800 flex">
+    <input id="input" type="text" placeholder="输入消息..." 
+      class="flex-1 p-2 rounded bg-gray-700 text-white focus:outline-none" />
+    <button id="send" 
+      class="ml-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-white">
       发送
     </button>
   </footer>
@@ -42,12 +34,5 @@
   <!-- 载入配置与主逻辑 -->
   <script src="config.js"></script>
   <script src="script.js"></script>
-
-  <!-- ✅ 可选：简单加载动画 -->
-  <script>
-    window.addEventListener("load", () => {
-      console.log("✅ 索菲娅启动成功。");
-    });
-  </script>
 </body>
 </html>
