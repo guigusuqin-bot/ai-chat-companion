@@ -8,24 +8,30 @@
 </head>
 
 <body class="bg-gray-900 text-white flex flex-col h-screen">
-  <header class="p-4 text-center text-lg font-semibold bg-gray-800">
+  <!-- 顶部标题 -->
+  <header class="p-4 text-center text-lg font-semibold bg-gray-800 shadow-md">
     💬 索菲娅 AI 聊天伴侣
   </header>
 
+  <!-- 聊天区 -->
   <main id="chat" class="flex-1 overflow-y-auto p-4 space-y-2"></main>
 
-  
-
-  <footer class="p-4 bg-gray-800 flex">
-    <input id="input" type="text" placeholder="输入消息..." 
-      class="flex-1 p-2 rounded bg-gray-700 text-white focus:outline-none" />
-    <button id="send" 
-      class="ml-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-white">
+  <!-- 底部输入框 -->
+  <footer class="p-4 bg-gray-800 flex border-t border-gray-700">
+    <input 
+      id="input" 
+      type="text" 
+      placeholder="输入消息..." 
+      class="flex-1 p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring focus:ring-blue-500" 
+    />
+    <button 
+      id="send"
+      class="ml-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-white font-medium shadow">
       发送
     </button>
   </footer>
 
-  <!-- 载入配置与主逻辑 -->
+  <!-- 引入配置与主逻辑 -->
   <script src="config.js"></script>
   <script src="script.js"></script>
 </body>
