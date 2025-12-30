@@ -17,7 +17,7 @@
       color: #9d174d;
     }
     .card {
-      background: rgba(255,255,255,0.75);
+      background: rgba(255,255,255,0.8);
       border-radius: 20px;
       padding: 30px;
       box-shadow: 0 0 25px rgba(0,0,0,0.1);
@@ -33,7 +33,8 @@
       border-radius: 10px;
       margin-top: 12px;
       text-align: center;
-      background: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.95);
+      font-size: 1rem;
     }
     button {
       margin-top: 18px;
@@ -53,6 +54,7 @@
       transform: scale(1.05);
       background: linear-gradient(to right, #ec4899, #db2777);
     }
+    #msg { margin-top: 8px; }
     audio { display: none; }
   </style>
 </head>
@@ -63,7 +65,7 @@
     <input type="text" id="username" placeholder="用户名">
     <input type="password" id="password" placeholder="密码">
     <button id="loginBtn">登录</button>
-    <p id="msg" class="mt-2 text-sm text-pink-700"></p>
+    <p id="msg" class="text-sm text-pink-700"></p>
   </div>
 
   <!-- 登录成功提示音 -->
@@ -72,25 +74,27 @@
   <script>
     // Base64("徐林静:20011014")
     const correctHash = "5Yqg5a2Q5paH6YOoOjIwMDExMDE0";
-
-    const btn = document.getElementById("loginBtn");
-    const msg = document.getElementById("msg");
     const sound = document.getElementById("loginSound");
+    const msg = document.getElementById("msg");
 
-    btn.addEventListener("click", () => {
+    function encode(str) {
+      return btoa(unescape(encodeURIComponent(str))); // 兼容中文
+    }
+
+    document.getElementById("loginBtn").addEventListener("click", () => {
       const u = document.getElementById("username").value.trim();
       const p = document.getElementById("password").value.trim();
-      const encoded = btoa(unescape(encodeURIComponent(u + ":" + p))); // 兼容中文
+      const encoded = encode(u + ":" + p);
 
       if (encoded === correctHash) {
         const token = btoa(Date.now() + ":" + u);
         localStorage.setItem("proton_token", token);
         localStorage.setItem("proton_user", u);
-        msg.innerText = "🌸 验证成功，正在进入质子 2 号...";
+        msg.innerText = "🌸 登录成功，正在进入质子 2 号...";
         sound.play();
         setTimeout(() => (window.location.href = "index.html"), 1800);
       } else {
-        msg.innerText = "❌ 用户名或密码错误";
+        msg.innerHTML = "❌ 用户名或密码错误";
       }
     });
   </script>
