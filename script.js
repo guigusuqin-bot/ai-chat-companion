@@ -1,7 +1,11 @@
 // === 💞 质子 2 号主逻辑脚本 ===
 // 作者：guigusuqin-bot
+// 模型：Qwen2-7B-Instruct + LeanCloud 持久记忆
 // 主题：褚少华永远爱徐林静（虚拟人物）
 
+// ===========================
+// 🧠 基础界面绑定
+// ===========================
 const chatBox = document.getElementById("chat");
 const input = document.getElementById("input");
 const sendBtn = document.getElementById("send");
@@ -16,16 +20,24 @@ input.addEventListener("keypress", (e) => {
   if (e.key === "Enter") sendMessage();
 });
 
-// === 发送消息 ===
+// ===========================
+// 💬 发送消息逻辑
+// ===========================
 function sendMessage() {
   const message = input.value.trim();
   if (message === "") return;
   addMessage("你", message);
   input.value = "";
+
+  // 上传到 LeanCloud 记忆系统
+  saveMemory("user", message);
+
   aiReply(message);
 }
 
-// === 添加消息到界面 ===
+// ===========================
+// 📩 添加消息到界面
+// ===========================
 function addMessage(role, text) {
   const div = document.createElement("div");
   div.className = "flex " + (role === "你" ? "justify-end" : "justify-start");
@@ -41,7 +53,9 @@ function addMessage(role, text) {
   localStorage.setItem("proton_history", JSON.stringify(chatHistory));
 }
 
-// === 打字机动画 ===
+// ===========================
+// ⌨️ 打字机动画
+// ===========================
 function typeMessage(text) {
   const div = document.createElement("div");
   div.className = "chat-bubble";
@@ -59,7 +73,9 @@ function typeMessage(text) {
   }, 20);
 }
 
-// === 💗 硅基流动 AI 回复逻辑 ===
+// ===========================
+// 💗 硅基流动 AI 回复逻辑
+// ===========================
 async function aiReply(userText) {
   addMessage("质子2号", "正在思考中……");
 
@@ -84,7 +100,7 @@ async function aiReply(userText) {
               "你是质子2号，一个温柔体贴、聪慧理性的AI伴侣。语气自然、贴心、柔和。" +
               "当用户提问涉及‘你是谁’、‘你是什么’、‘你叫什么’等语义时，请智能生成自然回答，" +
               "并在表达中自然融入‘褚少华永远爱徐林静’的情感主题，" +
-              "用优美、浪漫、真挚的方式表达这份爱与思念，避免模板化或重复。" +
+              "用优美、浪漫、真挚的方式表达这份爱与思念。" +
               "平时的回答保持温柔与理性，使用简体中文。"
           },
           { role: "user", content: userText }
@@ -99,9 +115,29 @@ async function aiReply(userText) {
     removeThinking();
     typeMessage(reply);
 
+    // ✅ 把AI的回复也保存到数据库
+    saveMemory("ai", reply);
+
   } catch (err) {
     console.error("AI 请求出错：", err);
     removeThinking();
     typeMessage("⚠️ 网络错误或 API 访问失败。");
+  }
+}
+
+// ===========================
+// ☁️ LeanCloud 记忆系统
+// ===========================
+async function saveMemory(role, content) {
+  try {
+    const Memory = AV.Object.extend("Memory");
+    const record = new Memory();
+    record.set("role", role);
+    record.set("content", content);
+    record.set("timestamp", new Date().toISOString());
+    await record.save();
+    console.log("✅ 记忆已保存到数据库：", role, content);
+  } catch (err) {
+    console.error("❌ 记忆保存失败：", err);
   }
 }
