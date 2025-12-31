@@ -13,9 +13,9 @@
   <script>
     // ✅ 替换成你 LeanCloud 控制台里的信息
     AV.init({
-      appId: "你的AppID",
-      appKey: "你的AppKey",
-      serverURL: "你的ServerURL"
+      appId: "eb5BJ7PXTDhsFevKoprEj3mQ-gzGzoHsz”,
+      appKey: "TOTCnlguKJU98IsFzsPuA1aT”，
+      serverURL: "NvSMfli4ZQRLurPSMXoHBi77”
     });
 
     // 点击按钮 -> 上传一条测试数据
