@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>质子 2 号 · 数据连接测试</title>
+  <script src="https://unpkg.com/leancloud-storage@4.15.0/dist/av-min.js"></script>
+</head>
+<body>
+  <h1>质子 2 号</h1>
+  <p>这是质子 2 号与 LeanCloud 的首次连接测试。</p>
+  <button id="save">🧠 上传一条记忆</button>
+
+  <script>
+    // ✅ 替换成你 LeanCloud 控制台里的信息
+    AV.init({
+      appId: "你的AppID",
+      appKey: "你的AppKey",
+      serverURL: "你的ServerURL"
+    });
+
+    // 点击按钮 -> 上传一条测试数据
+    document.getElementById("save").onclick = async function() {
+      const Memory = AV.Object.extend("Memory");
+      const record = new Memory();
+
+      // 添加测试内容
+      record.set("content", "质子 2 号的第一次记忆");
+      record.set("user", "admin");
+      record.set("timestamp", new Date().toISOString());
+
+      try {
+        await record.save();
+        alert("✅ 数据上传成功！请回 LeanCloud 查看 Memory 表。");
+      } catch (err) {
+        alert("❌ 上传失败：" + err.message);
+      }
+    };
+  </script>
+</body>
+</html>
