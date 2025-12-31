@@ -11,11 +11,11 @@
   <button id="save">🧠 上传一条记忆</button>
 
   <script>
-    // ✅ 替换成你 LeanCloud 控制台里的信息
+    // ✅ 替换成你 LeanCloud 控制台里的信息（英文引号！）
     AV.init({
-      appId: "eb5BJ7PXTDhsFevKoprEj3mQ-gzGzoHsz”,
-      appKey: "TOTCnlguKJU98IsFzsPuA1aT”，
-      serverURL: "NvSMfli4ZQRLurPSMXoHBi77”
+      appId: "eb5BJ7PXTDhsFevKoprEj3mQ-gzGzoHsz",
+      appKey: "TOTCnlguKJU98IsFzsPuA1aT",
+      serverURL: "https://nvsmfli4zqrlurpsmxohbi77.lc-cn-n1-shared.com"
     });
 
     // 点击按钮 -> 上传一条测试数据
