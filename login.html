@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>💞 登录 · 质子 2 号</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/leancloud-storage@4.15.0/dist/av-min.js"></script>
   <style>
     body {
       background: linear-gradient(145deg, #fce7f3, #f9a8d4);
@@ -56,7 +57,6 @@
       background: linear-gradient(to right, #ec4899, #db2777);
     }
     #msg { margin-top: 8px; }
-    audio { display: none; }
   </style>
 </head>
 <body>
@@ -69,40 +69,53 @@
     <p id="msg" class="text-sm text-pink-700"></p>
   </div>
 
-  <!-- 登录成功提示音 -->
   <audio id="loginSound" src="https://cdn.pixabay.com/download/audio/2022/10/25/audio_7f51e9ffb1.mp3?filename=magic-bell-150844.mp3"></audio>
 
   <script>
-    // ✅ 正确的 Base64("xulinjing:20011014")
-    const correctHash = "eHVsaW5qaW5nOjIwMDExMDE0";
-    const sound = document.getElementById("loginSound");
+    // ✅ 初始化 LeanCloud
+    AV.init({
+      appId: "eb5BJ7PXTDhsFevKoprEj3mQ-gzGzoHsz",
+      appKey: "TOTCnlguKJU98IsFzsPuA1aT",
+      serverURL: "https://nvsmfli4zqrlurpsmxohbi77.lc-cn-n1-shared.com"
+    });
+
     const msg = document.getElementById("msg");
+    const sound = document.getElementById("loginSound");
 
-    // 中文兼容编码
-    function encode(str) {
-      return btoa(unescape(encodeURIComponent(str)));
-    }
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
 
-    document.getElementById("loginBtn").addEventListener("click", () => {
-      const u = document.getElementById("username").value.trim();
-      const p = document.getElementById("password").value.trim();
-      const card = document.getElementById("loginCard");
-      const encoded = encode(u + ":" + p);
+      if (!username || !password) {
+        msg.innerText = "⚠️ 请输入用户名和密码";
+        return;
+      }
 
-      if (encoded === correctHash) {
-        const token = btoa(Date.now() + ":" + u);
+      msg.innerText = "⏳ 正在验证，请稍候...";
+
+      try {
+        // 🧠 登录 LeanCloud
+        const user = await AV.User.logIn(username, password);
+        console.log("✅ 登录成功：", user.toJSON());
+
+        // 🎖️ 检查是否管理员
+        const isAdmin = username === "Ccc";
+
+        // 💾 保存本地登录状态
+        const token = btoa(Date.now() + ":" + username);
         localStorage.setItem("proton_token", token);
-        localStorage.setItem("proton_user", u);
+        localStorage.setItem("proton_user", username);
+        localStorage.setItem("is_admin", isAdmin);
 
-        msg.innerText = "🌸 登录成功，正在进入质子 2 号...";
+        msg.innerText = "🌸 登录成功，欢迎回来 " + username;
         sound.play();
-        card.style.transform = "scale(0.97)";
+
         setTimeout(() => {
-          card.style.transform = "scale(1)";
-          window.location.href = "index.html";
-        }, 1800);
-      } else {
-        msg.innerHTML = "❌ 用户名或密码错误";
+          window.location.href = isAdmin ? "admin.html" : "index.html";
+        }, 1500);
+      } catch (err) {
+        console.error("❌ 登录失败", err);
+        msg.innerText = "❌ 登录失败：" + err.message;
       }
     });
   </script>
