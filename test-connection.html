@@ -1,34 +1,91 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>质子 2 号 · 国际节点连接测试</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>💞 质子 2 号 · 国际节点连接测试</title>
+  <style>
+    body {
+      font-family: "Microsoft YaHei", sans-serif;
+      background: linear-gradient(145deg, #ffd6e7, #ffffff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      padding: 30px;
+      width: 90%;
+      max-width: 400px;
+      animation: fadeIn 1s ease-in-out;
+    }
+    h1 {
+      color: #e91e63;
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+    p {
+      color: #555;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    #status {
+      font-weight: bold;
+      margin-top: 15px;
+      color: #333;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
-<body style="font-family: sans-serif; background: #fdf2f8; text-align: center; padding: 40px;">
-  <h2>💞 测试 LeanCloud 国际节点连接</h2>
-  <div id="result">正在连接中...</div>
+<body>
+  <div class="card">
+    <h1>💞 质子 2 号 · LeanCloud 国际节点测试</h1>
+    <p>检测你的应用是否成功连接数据库</p>
+    <div id="status">⏳ 正在连接中，请稍候...</div>
+  </div>
 
   <script src="https://unpkg.com/leancloud-storage@4.15.0/dist/av-min.js"></script>
   <script>
-    const APP_ID = "【你的 AppID】";
-    const APP_KEY = "【你的 AppKey】";
-    const SERVER_URL = "【你的 ServerURL】";
-    AV.init({ appId: APP_ID, appKey: APP_KEY, serverURL: SERVER_URL });
+    // === 你的 LeanCloud 国际节点凭证 ===
+    const APP_ID = "aaTo5CCDLh4OEg4J40OpQ4j-MdYXbMMI";
+    const APP_KEY = "bBC1u4IdXcesBDUbTKtnjzo";
+    const SERVER_URL = "https://aato5ccd.api.lncldglobal.com";
 
-    const Box = document.getElementById("result");
-    async function test() {
+    const statusBox = document.getElementById("status");
+
+    async function testConnection() {
       try {
+        AV.init({
+          appId: APP_ID,
+          appKey: APP_KEY,
+          serverURL: SERVER_URL
+        });
+        statusBox.textContent = "⚙️ 初始化成功，正在写入测试数据...";
+
         const Test = AV.Object.extend("ConnectionTest");
         const obj = new Test();
         obj.set("time", new Date().toISOString());
-        obj.set("status", "ok");
+        obj.set("status", "connected");
         await obj.save();
-        Box.textContent = "✅ 成功连接 LeanCloud 国际节点！数据已写入 ConnectionTest 表。";
-      } catch (e) {
-        Box.textContent = "❌ 连接失败：" + e.message;
+
+        statusBox.textContent = "✅ 成功连接 LeanCloud 国际节点！数据已写入 ConnectionTest 表。";
+        statusBox.style.color = "green";
+      } catch (err) {
+        console.error(err);
+        statusBox.textContent = "❌ 连接失败：" + err.message;
+        statusBox.style.color = "red";
       }
     }
-    test();
+
+    testConnection();
   </script>
 </body>
 </html>
