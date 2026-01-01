@@ -1,83 +1,34 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>质子 2 号 · LeanCloud 连接检测</title>
-  <style>
-    body {
-      font-family: "Microsoft YaHei", sans-serif;
-      background: linear-gradient(145deg, #ffd6e7, #fff);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .card {
-      background: #fff;
-      border-radius: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      padding: 30px;
-      width: 85%;
-      max-width: 400px;
-      text-align: center;
-    }
-    h1 {
-      color: #e91e63;
-      font-size: 22px;
-    }
-    p {
-      color: #444;
-      font-size: 15px;
-      line-height: 1.6;
-    }
-    #status {
-      margin-top: 15px;
-      font-weight: bold;
-      color: #555;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>质子 2 号 · 国际节点连接测试</title>
 </head>
-<body>
-  <div class="card">
-    <h1>💞 质子 2 号 · LeanCloud 连接检测</h1>
-    <div id="status">🧩 正在测试连接...</div>
-  </div>
+<body style="font-family: sans-serif; background: #fdf2f8; text-align: center; padding: 40px;">
+  <h2>💞 测试 LeanCloud 国际节点连接</h2>
+  <div id="result">正在连接中...</div>
 
   <script src="https://unpkg.com/leancloud-storage@4.15.0/dist/av-min.js"></script>
   <script>
-    const APP_ID = "eb5BJ7PXTDhsFevKoprEj3mQ-gzGzoHsz";
-    const APP_KEY = "TOTCnlguKJU98IsFzsPuA1aT";
-    const SERVER_URL = "https://eb5bj7px.lc-cn-n1-shared.com";
+    const APP_ID = "【你的 AppID】";
+    const APP_KEY = "【你的 AppKey】";
+    const SERVER_URL = "【你的 ServerURL】";
+    AV.init({ appId: APP_ID, appKey: APP_KEY, serverURL: SERVER_URL });
 
-    const statusBox = document.getElementById("status");
-
-    async function testConnection() {
+    const Box = document.getElementById("result");
+    async function test() {
       try {
-        AV.init({
-          appId: APP_ID,
-          appKey: APP_KEY,
-          serverURL: SERVER_URL
-        });
-
-        statusBox.textContent = "⚙️ LeanCloud 初始化完成，正在写入测试数据...";
-
         const Test = AV.Object.extend("ConnectionTest");
         const obj = new Test();
-        obj.set("result", "success");
-        obj.set("timestamp", new Date().toISOString());
+        obj.set("time", new Date().toISOString());
+        obj.set("status", "ok");
         await obj.save();
-
-        statusBox.textContent = "✅ 成功连接 LeanCloud！数据已写入 ConnectionTest 表。";
-        statusBox.style.color = "green";
-      } catch (err) {
-        statusBox.textContent = "❌ 连接失败：" + err.message;
-        statusBox.style.color = "red";
+        Box.textContent = "✅ 成功连接 LeanCloud 国际节点！数据已写入 ConnectionTest 表。";
+      } catch (e) {
+        Box.textContent = "❌ 连接失败：" + e.message;
       }
     }
-
-    testConnection();
+    test();
   </script>
 </body>
 </html>
