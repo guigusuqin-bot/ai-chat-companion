@@ -1,7 +1,6 @@
-// === 💞 质子 2 号主逻辑脚本 ===
+// === 💞 质子 2 号主逻辑脚本（阿里云版） ===
 // 作者：guigusuqin-bot
-// 模型：Qwen2-7B-Instruct + LeanCloud 持久记忆
-// 主题：褚少华永远爱徐林静（虚拟人物）
+// 模型：Qwen2-7B-Instruct + 阿里云 MySQL 数据库记忆系统
 
 // ===========================
 // 🧠 基础界面绑定
@@ -29,7 +28,7 @@ function sendMessage() {
   addMessage("你", message);
   input.value = "";
 
-  // 上传到 LeanCloud 记忆系统
+  // 上传到阿里云数据库
   saveMemory("user", message);
 
   aiReply(message);
@@ -116,7 +115,7 @@ async function aiReply(userText) {
     typeMessage(reply);
 
     // ✅ 把AI的回复也保存到数据库
-    saveMemory("ai", reply);
+    saveMemory("assistant", reply);
 
   } catch (err) {
     console.error("AI 请求出错：", err);
@@ -126,18 +125,19 @@ async function aiReply(userText) {
 }
 
 // ===========================
-// ☁️ LeanCloud 记忆系统
+// ☁️ 阿里云数据库存储
 // ===========================
 async function saveMemory(role, content) {
   try {
-    const Memory = AV.Object.extend("Memory");
-    const record = new Memory();
-    record.set("role", role);
-    record.set("content", content);
-    record.set("timestamp", new Date().toISOString());
-    await record.save();
-    console.log("✅ 记忆已保存到数据库：", role, content);
+    const user = localStorage.getItem("proton_user") || "guest";
+    const res = await fetch(SERVER_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user, role, content })
+    });
+    const data = await res.json();
+    console.log("✅ 数据已写入阿里云数据库：", data);
   } catch (err) {
-    console.error("❌ 记忆保存失败：", err);
+    console.error("❌ 写入失败：", err);
   }
 }
