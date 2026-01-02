@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>💞 质子 2 号 · 管理后台</title>
+  <title>💞 质子 2 号 · 管理后台（阿里云版）</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/leancloud-storage@4.15.0/dist/av-min.js"></script>
   <style>
     body {
       background: linear-gradient(145deg, #fce7f3, #f9a8d4, #f9a8d4);
@@ -46,7 +45,7 @@
 </head>
 <body class="p-4">
   <header class="flex justify-between items-center mb-4">
-    <h1 class="text-2xl font-bold text-pink-700">💞 质子 2 号 · 云记忆管理后台</h1>
+    <h1 class="text-2xl font-bold text-pink-700">💞 质子 2 号 · 阿里云记忆后台</h1>
     <div>
       <button id="refreshBtn">🔄 刷新</button>
       <button id="exportBtn">📦 导出 CSV</button>
@@ -67,24 +66,15 @@
         <th>角色</th>
         <th>内容</th>
         <th>时间</th>
-        <th>操作</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
 
   <script>
-    // ✅ LeanCloud 初始化
-    AV.init({
-      appId: "eb5BJ7PXTDhsFevKoprEj3mQ-gzGzoHsz",
-      appKey: "TOTCnlguKJU98IsFzsPuA1aT",
-      serverURL: "https://nvsmfli4zqrlurpsmxohbi77.lc-cn-n1-shared.com"
-    });
-
+    // === 🔐 管理员身份检查 ===
     const user = localStorage.getItem("proton_user");
     const isAdmin = localStorage.getItem("is_admin") === "true";
-
-    // 检查管理员身份
     if (!isAdmin || user !== "Ccc") {
       alert("⚠️ 非管理员账号，禁止访问！");
       window.location.href = "login.html";
@@ -96,61 +86,38 @@
     const logoutBtn = document.getElementById("logoutBtn");
     const filterBtn = document.getElementById("filterBtn");
 
-    // === 加载数据 ===
+    const SERVER_API = "http://47.83.127.203/api.php";
+
+    // === 从阿里云服务器加载数据 ===
     async function loadData(filterUser = "") {
-      tbody.innerHTML = "<tr><td colspan='5'>⏳ 正在加载数据...</td></tr>";
-
-      const query = new AV.Query("Memory");
-      query.limit(1000);
-      query.descending("createdAt");
-
+      tbody.innerHTML = "<tr><td colspan='4'>⏳ 正在加载数据...</td></tr>";
       try {
-        const results = await query.find();
-        let html = "";
+        const res = await fetch(SERVER_API);
+        const data = await res.json();
 
-        const filtered = filterUser
-          ? results.filter(r => (r.get("user") || "").includes(filterUser))
-          : results;
+        if (data.status !== "success") throw new Error("API 响应异常");
+        let list = data.data;
 
-        if (filtered.length === 0) {
-          tbody.innerHTML = "<tr><td colspan='5'>暂无数据</td></tr>";
+        if (filterUser) {
+          list = list.filter(item => item.user && item.user.includes(filterUser));
+        }
+
+        if (!list || list.length === 0) {
+          tbody.innerHTML = "<tr><td colspan='4'>暂无数据</td></tr>";
           return;
         }
 
-        filtered.forEach((r) => {
-          const user = r.get("user") || "未知";
-          const role = r.get("role") || "未知";
-          const content = r.get("content") || "(空)";
-          const time = new Date(r.get("timestamp")).toLocaleString();
-          const id = r.id;
-
-          html += `
-            <tr>
-              <td>${user}</td>
-              <td>${role}</td>
-              <td>${content}</td>
-              <td>${time}</td>
-              <td><button onclick="deleteRecord('${id}')">🗑 删除</button></td>
-            </tr>`;
-        });
-
-        tbody.innerHTML = html;
+        tbody.innerHTML = list.map(row => `
+          <tr>
+            <td>${row.user || "(未知)"}</td>
+            <td>${row.role || "-"}</td>
+            <td>${row.content || "(空)"}</td>
+            <td>${row.timestamp || "-"}</td>
+          </tr>
+        `).join("");
       } catch (err) {
-        console.error("❌ 读取失败", err);
-        tbody.innerHTML = `<tr><td colspan='5'>读取失败：${err.message}</td></tr>`;
-      }
-    }
-
-    // === 删除单条记录 ===
-    async function deleteRecord(id) {
-      if (!confirm("确定要删除这条记录吗？")) return;
-      try {
-        const obj = AV.Object.createWithoutData("Memory", id);
-        await obj.destroy();
-        alert("✅ 已删除");
-        loadData();
-      } catch (err) {
-        alert("❌ 删除失败：" + err.message);
+        console.error("❌ 数据加载失败", err);
+        tbody.innerHTML = `<tr><td colspan='4'>加载失败：${err.message}</td></tr>`;
       }
     }
 
@@ -159,7 +126,6 @@
       let csv = "用户,角色,内容,时间\n";
       document.querySelectorAll("#dataTable tbody tr").forEach(tr => {
         const cells = Array.from(tr.querySelectorAll("td"))
-          .slice(0, 4)
           .map(td => `"${td.innerText.replace(/"/g, '""')}"`);
         csv += cells.join(",") + "\n";
       });
@@ -171,7 +137,7 @@
       a.click();
     }
 
-    // === 绑定事件 ===
+    // === 绑定按钮事件 ===
     refreshBtn.onclick = () => loadData();
     exportBtn.onclick = () => exportCSV();
     filterBtn.onclick = () => {
