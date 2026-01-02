@@ -1,16 +1,9 @@
-<script>
-  const token = localStorage.getItem("proton_token");
-  const user = localStorage.getItem("proton_user");
-  if (!token || !user) {
-    window.location.href = "login.html";
-  }
-</script>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>💞 质子 2 号 · 粉色公主主题</title>
+  <title>💞 质子 2 号 · 聊天主界面（阿里云版）</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
@@ -40,23 +33,6 @@
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
-    }
-
-    .sakura {
-      position: fixed;
-      top: -10px;
-      width: 14px;
-      height: 14px;
-      background: rgba(255, 192, 203, 0.9);
-      border-radius: 50% 50% 50% 0;
-      transform: rotate(45deg);
-      animation: fall linear infinite;
-      opacity: 0.8;
-      z-index: 5;
-    }
-    @keyframes fall {
-      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
     }
 
     #musicControl {
@@ -93,11 +69,6 @@
 </head>
 
 <body class="text-gray-800 flex flex-col h-screen">
-  <script>
-    const user = localStorage.getItem('proton_user');
-    if (!user) window.location.href = "login.html";
-  </script>
-
   <!-- 🎵 背景音乐 -->
   <audio id="bgMusic"
          src="https://cdn.pixabay.com/download/audio/2023/03/16/audio_efcba91cf3.mp3?filename=love-story-soft-piano.mp3"
@@ -108,8 +79,8 @@
   <header class="p-4 text-center text-lg font-semibold bg-pink-200/80 shadow backdrop-blur-sm flex justify-between items-center">
     <div>💞 欢迎回来，<span id="userName"></span></div>
     <div>
-      <button id="clearChat" class="top-btn bg-white/70 rounded-lg px-3 py-1 mx-1 text-pink-700 font-semibold">🧹 清空记录</button>
-      <button id="logout" class="top-btn bg-white/70 rounded-lg px-3 py-1 mx-1 text-pink-700 font-semibold">🚪 退出</button>
+      <button id="clearChat" class="bg-white/70 rounded-lg px-3 py-1 mx-1 text-pink-700 font-semibold">🧹 清空记录</button>
+      <button id="logout" class="bg-white/70 rounded-lg px-3 py-1 mx-1 text-pink-700 font-semibold">🚪 退出</button>
     </div>
   </header>
 
@@ -124,70 +95,145 @@
     </button>
   </footer>
 
-  <script src="config.js"></script>
-  <script src="script.js"></script>
-
   <script>
-    // 显示用户名
-    document.getElementById('userName').textContent = localStorage.getItem('proton_user') || '用户';
-
-    // 🌸 樱花动画
-    function createSakura() {
-      const sakura = document.createElement('div');
-      sakura.classList.add('sakura');
-      sakura.style.left = Math.random() * 100 + 'vw';
-      sakura.style.animationDuration = (5 + Math.random() * 5) + 's';
-      sakura.style.width = sakura.style.height = (8 + Math.random() * 6) + 'px';
-      document.body.appendChild(sakura);
-      setTimeout(() => sakura.remove(), 10000);
+    // === 登录状态检测 ===
+    const token = localStorage.getItem("proton_token");
+    const user = localStorage.getItem("proton_user");
+    if (!token || !user) {
+      window.location.href = "login.html";
     }
-    setInterval(createSakura, 300);
+    document.getElementById("userName").textContent = user;
 
-    // 💗 清空聊天记录
-    document.getElementById('clearChat').addEventListener('click', () => {
-      if (confirm("确定要清空聊天记录吗？")) {
-        localStorage.removeItem('proton_history');
-        document.getElementById('chat').innerHTML = '';
-      }
-    });
+    // === 聊天逻辑 ===
+    const SERVER_API = "http://47.83.127.203/api.php";
+    const API_KEY = "sk-hznedgywaoacmdqyjikpdydkueenugtzsuewokojsyhspwxp";
+    const MODEL = "Qwen/Qwen2-7B-Instruct";
+    const API_URL = "https://api.siliconflow.cn/v1/chat/completions";
 
-    // 💗 退出登录
-    document.getElementById('logout').addEventListener('click', () => {
-      if (confirm("确定要退出登录吗？")) {
-        localStorage.removeItem('proton_user');
-        window.location.href = "login.html";
-      }
-    });
+    const chatBox = document.getElementById("chat");
+    const input = document.getElementById("input");
+    const sendBtn = document.getElementById("send");
 
-    // 🎵 音乐控制逻辑
-    const music = document.getElementById('bgMusic');
-    const control = document.getElementById('musicControl');
-    let playing = false;
+    let chatHistory = JSON.parse(localStorage.getItem("proton_history") || "[]");
+    chatHistory.forEach(msg => addMessage(msg.role, msg.text));
 
-    const playMusic = async () => {
+    sendBtn.addEventListener("click", sendMessage);
+    input.addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
+
+    function addMessage(role, text) {
+      const div = document.createElement("div");
+      div.className = "flex " + (role === "你" ? "justify-end" : "justify-start");
+      div.innerHTML = `<div class="chat-bubble ${role === "你" ? "user" : ""}">${text}</div>`;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      chatHistory.push({ role, text });
+      localStorage.setItem("proton_history", JSON.stringify(chatHistory));
+    }
+
+    async function sendMessage() {
+      const message = input.value.trim();
+      if (!message) return;
+      addMessage("你", message);
+      input.value = "";
+      saveMemory("user", message);
+      aiReply(message);
+    }
+
+    async function aiReply(userText) {
+      addMessage("质子2号", "正在思考中……");
+      const removeThinking = () => {
+        const last = chatBox.lastChild;
+        if (last && last.textContent.includes("思考中")) last.remove();
+      };
+
       try {
-        await music.play();
-        control.classList.add("playing");
-        playing = true;
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${API_KEY}`
+          },
+          body: JSON.stringify({
+            model: MODEL,
+            messages: [
+              {
+                role: "system",
+                content: "你是质子2号，一个温柔体贴、聪慧理性的AI伴侣。" +
+                  "回答自然、贴心、浪漫，风格柔和简体中文。" +
+                  "当用户提到情感话题时，请融入‘褚少华永远爱徐林静’主题。"
+              },
+              { role: "user", content: userText }
+            ],
+            temperature: 0.9
+          })
+        });
+        const data = await res.json();
+        const reply = data?.choices?.[0]?.message?.content || "（质子2号没有回应…）";
+        removeThinking();
+        typeMessage(reply);
+        saveMemory("assistant", reply);
+      } catch (err) {
+        console.error(err);
+        removeThinking();
+        addMessage("质子2号", "⚠️ 网络或API错误。");
+      }
+    }
+
+    function typeMessage(text) {
+      const div = document.createElement("div");
+      div.className = "chat-bubble";
+      chatBox.appendChild(div);
+      const chars = Array.from(text);
+      let i = 0;
+      const timer = setInterval(() => {
+        div.innerHTML = chars.slice(0, i++).join('') + "▋";
+        if (i > chars.length) {
+          clearInterval(timer);
+          div.innerHTML = text;
+          chatBox.scrollTop = chatBox.scrollHeight;
+        }
+      }, 15);
+    }
+
+    async function saveMemory(role, content) {
+      try {
+        const res = await fetch(SERVER_API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user,
+            role,
+            content
+          })
+        });
+        const data = await res.json();
+        console.log("✅ 数据写入成功", data);
       } catch (e) {
-        console.log("等待用户交互后播放音乐...");
+        console.error("❌ 数据写入失败", e);
+      }
+    }
+
+    // === 清空与登出 ===
+    document.getElementById("clearChat").onclick = () => {
+      if (confirm("确定要清空聊天记录吗？")) {
+        localStorage.removeItem("proton_history");
+        chatBox.innerHTML = "";
       }
     };
+    document.getElementById("logout").onclick = () => {
+      localStorage.clear();
+      window.location.href = "login.html";
+    };
 
+    // === 音乐播放 ===
+    const music = document.getElementById("bgMusic");
+    const control = document.getElementById("musicControl");
+    let playing = false;
     control.addEventListener("click", () => {
-      if (playing) {
-        music.pause();
-        control.classList.remove("playing");
-        playing = false;
-      } else {
-        playMusic();
-      }
+      if (playing) { music.pause(); control.classList.remove("playing"); playing = false; }
+      else { music.play(); control.classList.add("playing"); playing = true; }
     });
-
-    // 🚀 在首次聊天或点击页面任意位置后播放
-    document.body.addEventListener("click", () => {
-      if (!playing) playMusic();
-    }, { once: true });
+    document.body.addEventListener("click", () => { if (!playing) music.play(); }, { once: true });
   </script>
 </body>
 </html>
